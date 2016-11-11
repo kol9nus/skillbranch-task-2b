@@ -7,10 +7,11 @@ function firstLetterToUpper(word) {
   return `${word[0].toUpperCase()}${word.substring(1)}`;
 }
 
+function isNameValid(name) {
+  return name && onlyLettersPattern.test(name);
+}
+
 function splitFullName(fullName) {
-  if (!fullName) {
-    return [];
-  }
 
   const splittedName = fullName.trim()
     .toLowerCase()
@@ -46,10 +47,13 @@ function formatName(lastName, firstName, middleName) {
 const app = express();
 app.use(cors());
 app.get('/', (req, res) => {
-  const splittedName = splitFullName(req.query.fullname);
-  const isEveryNameCorrect = splittedName.every(name => onlyLettersPattern.test(name));
-  const formattedName = splittedName.length && isEveryNameCorrect ?
-    formatName(...splittedName) : 'Invalid fullname';
+  let formattedName = 'Invalid fullname';
+  if (isNameValid(req.query.fullname)) {
+    const splittedName = splitFullName(req.query.fullname);
+    if (splittedName.length) {
+      formattedName = formatName(...splittedName);
+    }
+  }
   res.send(formattedName);
 });
 
